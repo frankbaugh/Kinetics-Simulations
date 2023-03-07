@@ -4,7 +4,7 @@ from scipy.integrate import solve_ivp
 import numpy as np
 
 def fold(urea):
-
+    "This does the folding simulation"
     ## Define Rates as they vary with urea concentration
     k= np.zeros(4)
     k[0] = 26000 * pow(np.e, -1.68 * urea)
@@ -58,7 +58,7 @@ def fold(urea):
     print(tmax)
     return State, sol_tot, t_tot
 
-def graph_fold():
+def save_fold():
 
     D, I, N = [], [], []
     urea = np.arange(0,9,0.2)
@@ -70,11 +70,9 @@ def graph_fold():
         I.append(St[1])
         N.append(St[2])
 
-    
-
     with open("folding.dat", "w") as f:
         f.write("# U \t D \t I \t N \n") 
         for udin in zip(urea, D, I, N): 
             f.write("\t".join([str(n) for n in udin])+ "\n")
-    
-graph_fold()
+
+save_fold()
