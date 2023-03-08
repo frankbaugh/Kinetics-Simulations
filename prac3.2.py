@@ -3,41 +3,28 @@ import numpy as np
 import pandas as pd
 import pickle
 import time
-from numba import jit, float64
+from numba import jit
 
-## state = np.array([r1,r3, -1 * r1 -r2,r4,-1 * r1 + r2 -r3 - 2 * r4,
-##                  r1 + r2 + r5, -1 * r3 - r5])
 @jit(nopython=True)
 def ODE_func(t, state, k1, k2, k3, k4 ,k5):
     "returns d(state)/dt for the integrator"
-    ##        A, B, P, Q, X, Y, Z
+    ## []     A, B, P, Q, X, Y, Z
     ## state: 0, 1, 2, 3, 4, 5, 6
-    ## Sacrificing some readability for speed here: creating arrays is slow
+    ## r refers to rates of each reaction
 
     r1 = -1. * k1 * state[0] * state[5]
     r2 = -1. * k2 * state[4] * state[5]
     r3 = -1. * k3 * state[1] * state[4]
     r4 = k4 * state[4] * state[4]
     r5 = k5 * state[6]
-    """
-    This, oddly, does not work, something to do with how variables are stored, which is a shame
-    because it would be much faster with numba if it did
-    state[0] = r1
-    state[1] = r3
-    state[2] = (-1 * r1) - r2
-    state[3] = r4
-    state[4] = (-1 * r1) + r2 - r3 - (2 * r4)
-    state[5] =  r1 + r2 + r5
-    state[6] = (-1 * r3) - r5
-    """ 
-    return [r1,r3, -1. * r1 -r2,r4,-1. * r1 + r2 -r3 - 2 * r4, r1 + r2 + r5, -1. * r3 - r5]
+
+    return [r1, r3, -1. * r1 -r2, r4, -1. * r1 + r2 -r3 - 2 * r4, r1 + r2 + r5, -1. * r3 - r5]
 
 
 def getjac(t, state, k1, k2, k3, k4, k5):
     """Jacobian = df_i / dy_j ; needed here to obtain reasonable results with
     the stiff solver method Radau. it is actually slower to use jit here because
     creating numpy arrays with numba is very slow"""
-
 
     jac = np.zeros((7,7))
     jac[0][0] = -1 * k1 * state[5]
