@@ -4,8 +4,9 @@ import pandas as pd
 import pickle
 import time
 from numba import jit
+import os
 
-@jit(nopython=True)
+@jit(nopython=True) # the jit tag tells numba to compile this function in c (faster)
 def ODE_func(t, state, k1, k2, k3, k4 ,k5):
     "returns d(state)/dt for the integrator"
     ## []     A, B, P, Q, X, Y, Z
@@ -19,7 +20,6 @@ def ODE_func(t, state, k1, k2, k3, k4 ,k5):
     r5 = k5 * state[6]
 
     return [r1, r3, -1. * r1 -r2, r4, -1. * r1 + r2 -r3 - 2 * r4, r1 + r2 + r5, -1. * r3 - r5]
-
 
 def getjac(t, state, k1, k2, k3, k4, k5):
     """Jacobian = df_i / dy_j ; needed here to obtain reasonable results with
@@ -49,7 +49,6 @@ def getjac(t, state, k1, k2, k3, k4, k5):
 
     return jac
 
-
 def sampler(T, X, Y, Z):
     "Takes samples at regular intervals from the data since there is more than required"
     
@@ -68,7 +67,6 @@ def run_reac():
     t_eval = np.arange(tmin,tmax,dt)
 
     ## Define rate constants and initial conditions
- 
     k1 = 1.34 * pow(10, 0)
     k2 = 1.6 * pow(10, 9)
     k3 = 8. * pow(10, 3)
@@ -79,7 +77,6 @@ def run_reac():
     ## Scipy uses c / fortran and is much quicker than anything I could write
     ## Since this system is 'stiff' (potentially unstable), Radau and BDF are recommended
     ## Radau seems to give smoothest behaviour
-
     sol = solve_ivp(ODE_func, [tmin, tmax], initial, t_eval=t_eval, dense_output=False, 
     vectorized=True, method = "Radau", args = (k1, k2, k3, k4, k5), jac = getjac)
 
@@ -96,5 +93,6 @@ def run_reac():
 start_time = time.time()
 run_reac()
 
-print("--- %s seconds ---" % (time.time() - start_time))
+print("Time taken: %s seconds" % (time.time() - start_time))
 
+os.system("python3 prac3.2plot.py")
