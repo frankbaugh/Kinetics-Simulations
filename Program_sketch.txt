@@ -1,0 +1,26 @@
+Program sketch: Oregonator in space
+
+
+Concentration now a function of time (discrete) and location (discrete).
+
+The reaction class will be initialized by:
+
+creating the state as an array of concentrations for each combination of spatial co-ordinates,
+for each species
+
+a time variable
+
+
+The class will need:
+
+ a function to time-evolve the spatial concentrations (according to Fick's law)  
+
+
+ a function to time-evolve the reactions. This needs to be done at every discrete point in the space
+
+a function to append the current state to a file for storage
+
+
+the reaction can be run by repeatedly calling these 3 functions (in the given order) whilst advancing the time. 
+
+
