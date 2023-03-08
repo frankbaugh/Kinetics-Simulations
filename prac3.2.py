@@ -95,4 +95,5 @@ run_reac()
 
 print("Time taken: %s seconds" % (time.time() - start_time))
 
+## Call the script to plot saved data
 os.system("python3 prac3.2plot.py")
